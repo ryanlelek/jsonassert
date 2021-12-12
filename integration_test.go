@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/kinbiko/jsonassert"
+	"github.com/ryanlelek/jsonassert"
 )
 
 func TestAssertf(t *testing.T) {

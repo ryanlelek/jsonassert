@@ -128,3 +128,8 @@ func (a *Asserter) Assertf(actualJSON, expectedJSON string, fmtArgs ...interface
 	a.tt.Helper()
 	a.pathassertf("$", actualJSON, fmt.Sprintf(expectedJSON, fmtArgs...))
 }
+
+func Assert(actualJSON, expectedJSON string, fmtArgs ...interface{}) error {
+	err := Validate("$", actualJSON, fmt.Sprintf(expectedJSON, fmtArgs...))
+	return err
+}

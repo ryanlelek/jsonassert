@@ -3,6 +3,8 @@ package jsonassert
 import (
 	"math"
 	"strconv"
+	"fmt"
+	"errors"
 )
 
 // This is *probably* good enough. Can change this to be even smaller if necessary
@@ -17,4 +19,11 @@ func (a *Asserter) checkNumber(path string, act, exp float64) {
 
 func extractNumber(n string) (float64, error) {
 	return strconv.ParseFloat(n, 64)
+}
+
+func checkNumber(path string, act, exp float64) error {
+	if diff := math.Abs(act - exp); diff > minDiff {
+		return errors.New(fmt.Sprintf("expected number at '%s' to be '%.7f' but was '%.7f'", path, exp, act))
+	}
+	return nil
 }

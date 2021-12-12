@@ -1,6 +1,9 @@
 package jsonassert
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 func extractBoolean(b string) (bool, error) {
 	if b == "true" {
@@ -17,4 +20,11 @@ func (a *Asserter) checkBoolean(path string, act, exp bool) {
 	if act != exp {
 		a.tt.Errorf("expected boolean at '%s' to be %v but was %v", path, exp, act)
 	}
+}
+
+func checkBoolean(path string, act, exp bool) error {
+	if act != exp {
+		return errors.New(fmt.Sprintf("expected boolean at '%s' to be %v but was %v", path, exp, act))
+	}
+	return nil
 }

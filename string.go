@@ -2,6 +2,7 @@ package jsonassert
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -15,6 +16,17 @@ func (a *Asserter) checkString(path, act, exp string) {
 			a.tt.Errorf("expected string at '%s' to be\n'%s'\nbut was\n'%s'", path, exp, act)
 		}
 	}
+}
+
+func checkString(path, act, exp string) error {
+	if act != exp {
+		if len(exp+act) < 50 {
+			return errors.New(fmt.Sprintf("expected string at '%s' to be '%s' but was '%s'", path, exp, act))
+		} else {
+			return errors.New(fmt.Sprintf("expected string at '%s' to be\n'%s'\nbut was\n'%s'", path, exp, act))
+		}
+	}
+	return nil
 }
 
 func extractString(s string) (string, error) {

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"errors"
 )
 
 func (a *Asserter) checkObject(path string, act, exp map[string]interface{}) {
@@ -22,6 +23,27 @@ func (a *Asserter) checkObject(path string, act, exp map[string]interface{}) {
 			a.pathassertf(path+"."+key, serialize(act[key]), serialize(exp[key]))
 		}
 	}
+}
+
+func checkObject(path string, act, exp map[string]interface{}) error {
+	if len(act) != len(exp) {
+		return errors.New(fmt.Sprintf("expected %d keys at '%s' but got %d keys", len(exp), path, len(act)))
+	}
+	if unique := difference(act, exp); len(unique) != 0 {
+		return errors.New(fmt.Sprintf("unexpected object key(s) %+v found at '%s'", serialize(unique), path))
+	}
+	if unique := difference(exp, act); len(unique) != 0 {
+		return errors.New(fmt.Sprintf("expected object key(s) %+v missing at '%s'", serialize(unique), path))
+	}
+	for key := range act {
+		if contains(exp, key) {
+			err := Validate(path+"."+key, serialize(act[key]), serialize(exp[key]))
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func difference(act, exp map[string]interface{}) []string {

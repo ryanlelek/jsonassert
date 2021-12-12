@@ -7,6 +7,70 @@ import (
 	"strings"
 )
 
+func Validate(path, act, exp string) error {
+	if act == exp {
+		return nil
+	}
+	actType, err := findType(act)
+	if err != nil {
+		return err
+	}
+	expType, err := findType(exp)
+	if err != nil {
+		return err
+	}
+
+	// If we're only caring about the presence of the key, then don't bother checking any further
+	if expPresence, _ := extractString(exp); expPresence == "<<PRESENCE>>" {
+		if actType == jsonNull {
+			return errors.New(fmt.Sprintf(`expected the presence of any value at '%s', but was absent`, path))
+		}
+		return nil
+	}
+
+	if actType != expType {
+		return errors.New(fmt.Sprintf("actual JSON (%s) and expected JSON (%s) were of different types at '%s'", actType, expType, path))
+	}
+	switch actType {
+	case jsonBoolean:
+		actBool, _ := extractBoolean(act)
+		expBool, _ := extractBoolean(exp)
+		checkBoolean(path, actBool, expBool)
+		if err != nil {
+			return err
+		}
+	case jsonNumber:
+		actNumber, _ := extractNumber(act)
+		expNumber, _ := extractNumber(exp)
+		checkNumber(path, actNumber, expNumber)
+		if err != nil {
+			return err
+		}
+	case jsonString:
+		actString, _ := extractString(act)
+		expString, _ := extractString(exp)
+		err := checkString(path, actString, expString)
+		if err != nil {
+			return err
+		}
+	case jsonObject:
+		actObject, _ := extractObject(act)
+		expObject, _ := extractObject(exp)
+		err := checkObject(path, actObject, expObject)
+		if err != nil {
+			return err
+		}
+	case jsonArray:
+		actArray, _ := extractArray(act)
+		expArray, _ := extractArray(exp)
+		err := checkArray(path, actArray, expArray)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (a *Asserter) pathassertf(path, act, exp string) {
 	a.tt.Helper()
 	if act == exp {

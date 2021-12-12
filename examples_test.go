@@ -3,7 +3,7 @@ package jsonassert_test
 import (
 	"fmt"
 
-	"github.com/kinbiko/jsonassert"
+	"github.com/ryanlelek/jsonassert"
 )
 
 type printer struct{}
